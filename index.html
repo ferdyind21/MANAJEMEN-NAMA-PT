@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencarian Nama PT</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Simpel -->
+    <header class="bg-indigo-700 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-building text-2xl text-amber-300"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Daftar & Pencarian Nama PT</h1>
+                    <span id="cloudStatus" class="text-[10px] text-indigo-200 flex items-center space-x-1 mt-0.5">
+                        <i class="fa-solid fa-circle text-[7px] text-amber-400 animate-pulse"></i>
+                        <span>Menghubungkan ke Cloud...</span>
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span id="badgeCount" class="bg-indigo-900/60 text-indigo-100 text-xs px-3 py-1.5 rounded-full font-semibold border border-indigo-500">
+                    0 PT
+                </span>
+                <button id="btnOpenAddModal" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition active:scale-95">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                    <span>Tambah PT</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-6 space-y-4">
+
+        <!-- Box Kotak Pencarian -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                    class="w-full pl-11 pr-10 py-3.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-base font-medium text-slate-800 placeholder-slate-400 outline-none" 
+                    placeholder="Ketik nama PT atau Nomor (contoh: BINTANG, 199, INDO)..."
+                    autofocus
+                    autocomplete="off">
+                <button id="btnClearSearch" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabel Data PT -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase text-xs">
+                        <tr>
+                            <th class="px-5 py-3.5 w-16 text-center border-r border-slate-200">No</th>
+                            <th class="px-5 py-3.5">Nama PT / Perusahaan</th>
+                            <th class="px-5 py-3.5 w-32 text-center">Nomor</th>
+                            <th class="px-5 py-3.5 w-20 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 bg-white">
+                        <!-- Data dimasukkan via Javascript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pesan jika tidak ditemukan -->
+            <div id="noResults" class="hidden p-8 text-center text-slate-400">
+                <i class="fa-solid fa-magnifying-glass text-4xl mb-2 text-slate-300 block"></i>
+                <p class="font-medium text-slate-600">Nama PT tidak ditemukan</p>
+                <p class="text-xs text-slate-400 mt-1">Coba ketik dengan kata kunci lain</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Form Tambah Data PT -->
+    <div id="addModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-building-circle-check text-indigo-600"></i>
+                    <span>Tambah PT Baru</span>
+                </h3>
+                <button id="btnCloseAddModal" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form id="addPtForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Perusahaan / PT</label>
+                    <input type="text" id="inputPtName" required 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium outline-none"
+                        placeholder="Contoh: PT MAKMUR SEJAHTERA">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nomor</label>
+                    <input type="text" id="inputPtNumber" required 
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium outline-none"
+                        placeholder="Contoh: 150 atau 12/88">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" id="btnCancelAdd" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        Simpan Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="deleteModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-slate-100 text-center space-y-3">
+            <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-trash-can text-xl"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">Hapus Data PT?</h3>
+            <p id="deleteTargetText" class="text-xs text-slate-500 font-medium"></p>
+            <div class="flex space-x-2 pt-2">
+                <button id="btnCancelDelete" class="w-1/2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+                    Batal
+                </button>
+                <button id="btnConfirmDelete" class="w-1/2 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow transition">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Simpel -->
+    <footer class="py-4 text-center text-xs text-slate-400">
+        Database NAMA PT &bull; Cloud Firestore Real-time Sync
+    </footer>
+
+    <!-- Firebase SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase bawaan lingkungan runtime
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nama-pt-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        // Data Asli Bawaan PDF
+        const defaultPtData = [
+            { id: "1", name: "AL-FAMS SNACK", number: "200" },
+            { id: "2", name: "ALVA KARYA ABADI/ HANSEL", number: "11" },
+            { id: "3", name: "AMAT (BUANA ANEKA JAYA/BAJ)", number: "197" },
+            { id: "4", name: "AMIN (PS)", number: "167" },
+            { id: "5", name: "ANUGERAH PERKASA SEJAHTERA", number: "7" },
+            { id: "6", name: "ARTHA JAYA SEMESTA", number: "12" },
+            { id: "7", name: "ASE/JOHAN (MJM)", number: "182" },
+            { id: "8", name: "ASIA PARAMITA INDAH", number: "146" },
+            { id: "9", name: "BASRENG AW", number: "200" },
+            { id: "10", name: "BENTORO", number: "18" },
+            { id: "11", name: "BERKAT ANATASIA", number: "187" },
+            { id: "12", name: "BESTINDO PERSADA (CLB)", number: "199" },
+            { id: "13", name: "BINTAN KARYA SUKSES SEJATI", number: "199" },
+            { id: "14", name: "BINTAN SUKSES MANDIRI (BSM)", number: "166" },
+            { id: "15", name: "BINTANG LESTARI SEJAHTERA (BLS)", number: "23" },
+            { id: "16", name: "BINTANG MAKMUR", number: "192" },
+            { id: "17", name: "BINTANG SUKSES KEPRI", number: "196" },
+            { id: "18", name: "BL (BINTANG LIMA)", number: "21" },
+            { id: "19", name: "BUANA ANEKA PANGAN", number: "171" },
+            { id: "20", name: "CAHAYA GEMILANG PERKASA", number: "199" },
+            { id: "21", name: "CIPTA NIAGA SEMESTA (COLAMASS)", number: "26" },
+            { id: "22", name: "CITRA MANDIRI DISTRIBUSINDO", number: "183" },
+            { id: "23", name: "CITRA UTAMA DISTRIBUSINDO RAYA/ INDONESIA", number: "30" },
+            { id: "24", name: "CSB (ALAK/ BIGBOSS)", number: "186" },
+            { id: "25", name: "DILINDO BERKAH SEJAHTERA", number: "199" },
+            { id: "26", name: "DIVIGA GARAM INDONESIA", number: "199" },
+            { id: "27", name: "ENSEVAL PUTERA MEGATRADING", number: "36" },
+            { id: "28", name: "ERA", number: "37" },
+            { id: "29", name: "F INDO", number: "199" },
+            { id: "30", name: "GLORY PLASTIK", number: "199" },
+            { id: "31", name: "HANSEL DUTA", number: "49" },
+            { id: "32", name: "HPIC/HERRY", number: "52" },
+            { id: "33", name: "INDO WARNA PERKASA (COCACOLA)", number: "31" },
+            { id: "34", name: "INDOGABEN", number: "58/199" },
+            { id: "35", name: "INDOMARCO ADIPRIMA", number: "60" },
+            { id: "36", name: "INDORA JAYA", number: "165" },
+            { id: "37", name: "INTERFOOD (ISJ)", number: "61" },
+            { id: "38", name: "JAFAR (BTS)", number: "169" },
+            { id: "39", name: "JONI AHAI (CBS)", number: "195" },
+            { id: "40", name: "KAPAL TANGKER (CHANDRA)", number: "69" },
+            { id: "41", name: "LAUTAN PLASTIK BENING", number: "199" },
+            { id: "42", name: "LESTARI MANDIRI JAYA (LMJ)", number: "81" },
+            { id: "43", name: "LIM SIANG HUAT", number: "80" },
+            { id: "44", name: "LOGEN JAYA ABADI", number: "82" },
+            { id: "45", name: "M9 (MAKP)", number: "86" },
+            { id: "46", name: "MARGA NUSANTARA JAYA", number: "92" },
+            { id: "47", name: "MAXINDO MITRA (AMN, ARTHA MAKMUR NUSANTARA)", number: "85" },
+            { id: "48", name: "MHS/ABUN", number: "184" },
+            { id: "49", name: "MITRA AMBAR JAYA USAHA", number: "199" },
+            { id: 50, name: "MITRA INDODIST SEJAHTERA (MIS)", number: "175" },
+            { id: "51", name: "MITRA SINTERA / MITRA NIAGA", number: "199" },
+            { id: "52", name: "MMPJ (BERAS KIJANG / AB-82/MHS)", number: "184" },
+            { id: "53", name: "MULTIBOLGA", number: "178" },
+            { id: "54", name: "NAMSENG (NIAGA UTAMA SARANA PANGAN, GREAT PACK)", number: "17" },
+            { id: "55", name: "NATURAL", number: "97" },
+            { id: "56", name: "PAN BARUNA", number: "173" },
+            { id: "57", name: "PASIFIC BATAM PERKASA", number: "128" },
+            { id: "58", name: "PENJAYA SUKSES MANDIRI", number: "199" },
+            { id: "59", name: "PENTA VALEN TBK", number: "199" },
+            { id: "60", name: "PRIMA BINTANG DISTRIBUSINDO (BINTANG LIMA)", number: "21" },
+            { id: "61", name: "PRIMA NIAGA INDOMAS", number: "104" },
+            { id: "62", name: "PRISMA RINTIS SEJAHTERA", number: "105" },
+            { id: "63", name: "PT AYAM JAGO BATAM (EGO)", number: "35" },
+            { id: "64", name: "PT PNI", number: "104" },
+            { id: "65", name: "RATU NIAGA", number: "168" },
+            { id: "66", name: "RINTIS SEJAHTERA MAKMUR", number: "169" },
+            { id: "67", name: "ROKOK", number: "111" },
+            { id: "68", name: "SELATINDO BATAM MANDIRI (KIAN JAYA)", number: "120" },
+            { id: "69", name: "SEMESTA INDO PRATAMA (ANEKA CEMILAN TOYO)", number: "200" },
+            { id: "70", name: "SERAYA MAKMUR PERDANA (SMP)", number: "5" },
+            { id: "71", name: "SETIA INDO JAYA", number: "200" },
+            { id: "72", name: "SINAR INDO PERSADA", number: "128" },
+            { id: "73", name: "SINAR KOBEL NG TOSS", number: "199" },
+            { id: "74", name: "SINAR SUKSES PERMATA", number: "52" },
+            { id: "75", name: "SKS (SKS, SIP, PBP)", number: "128" },
+            { id: 76, name: "SM 2003 (SANJAYA MANDIRI)", number: "140" },
+            { id: "77", name: "SRIJAYA KARYA MAKMUR", number: "134" },
+            { id: "78", name: "SRIJAYA RAYA PERKASA-SRP", number: "126" },
+            { id: "79", name: "STARTMARA", number: "177" },
+            { id: "80", name: "SUKSES JAYA INDAH", number: "121" },
+            { id: "81", name: "SUMBER CIPTA AGUNG (SCA) / (CSA)", number: "127" },
+            { id: "82", name: "SUMBER KARYA DISTRIBUSINDO (SKD)", number: "199" },
+            { id: "83", name: "SUMBER MAS PERMAI", number: "156" },
+            { id: "84", name: "SUMBER SARI", number: "129" },
+            { id: "85", name: "SUMBER SARI SEKAWAN", number: "130" },
+            { id: "86", name: "SURYA MADISTRINDO", number: "111" },
+            { id: "87", name: "TEMPO", number: "147" },
+            { id: "88", name: "TIGA BENUA", number: "148" },
+            { id: "89", name: "TIGA RAKSA SATRIA", number: "199" },
+            { id: "90", name: "TOKO PANTENT", number: "200" },
+            { id: "91", name: "USAHA SUKSES (AIS)", number: "199" },
+            { id: "92", name: "WSA (ASIANG, J21)", number: "179" },
+            { id: "93", name: "WYSSA ARTHA SEJAHTERA", number: "199" },
+            { id: "94", name: "YAFINDO MITRA PERMATA (UKP, KPP, KSP, KBM, AMS)", number: "158" }
+        ];
+
+        let ptData = [...defaultPtData];
+        let deleteTargetId = null;
+        let db = null;
+        let auth = null;
+        let isCloudConnected = false;
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const btnClearSearch = document.getElementById('btnClearSearch');
+        const tableBody = document.getElementById('tableBody');
+        const noResults = document.getElementById('noResults');
+        const badgeCount = document.getElementById('badgeCount');
+        const cloudStatus = document.getElementById('cloudStatus');
+
+        // Modal Elements
+        const btnOpenAddModal = document.getElementById('btnOpenAddModal');
+        const btnCloseAddModal = document.getElementById('btnCloseAddModal');
+        const btnCancelAdd = document.getElementById('btnCancelAdd');
+        const addModal = document.getElementById('addModal');
+        const addPtForm = document.getElementById('addPtForm');
+        const inputPtName = document.getElementById('inputPtName');
+        const inputPtNumber = document.getElementById('inputPtNumber');
+
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteTargetText = document.getElementById('deleteTargetText');
+        const btnCancelDelete = document.getElementById('btnCancelDelete');
+        const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+
+        // Render Awal
+        updateDisplay();
+
+        // Inisialisasi Firebase & Real-time Database
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                updateCloudStatus(false, "Penyimpanan Lokal (Browser)");
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Autentikasi
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        isCloudConnected = true;
+                        updateCloudStatus(true, "Terhubung Awan (Cloud Sync)");
+                        subscribeToData();
+                    } else {
+                        updateCloudStatus(false, "Offline / Offline Mode");
+                    }
+                });
+
+            } catch (err) {
+                console.warn("Koneksi Firebase gagal, menggunakan mode lokal:", err);
+                updateCloudStatus(false, "Penyimpanan Lokal (Browser)");
+            }
+        }
+
+        // Membaca data real-time dari Cloud Firestore
+        function subscribeToData() {
+            if (!db || !auth.currentUser) return;
+
+            const ptCollection = collection(db, 'artifacts', appId, 'public', 'data', 'pt_list');
+
+            onSnapshot(ptCollection, (snapshot) => {
+                if (!snapshot.empty) {
+                    const cloudData = [];
+                    snapshot.forEach(docSnap => {
+                        cloudData.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    // Urutkan berdasarkan waktu buat atau ID
+                    cloudData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    ptData = cloudData;
+                } else {
+                    // Jika database cloud masih kosong, unggah data awal dari PDF
+                    seedInitialData();
+                }
+                updateDisplay();
+            }, (error) => {
+                console.error("Firestore Listen Error:", error);
+            });
+        }
+
+        // Mengisi data awal ke Cloud Firestore saat pertama kali
+        async function seedInitialData() {
+            if (!db || !auth.currentUser) return;
+            try {
+                for (const item of defaultPtData) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'pt_list', item.id.toString());
+                    await setDoc(docRef, {
+                        name: item.name,
+                        number: item.number,
+                        createdAt: Number(item.id) || Date.now()
+                    });
+                }
+            } catch (err) {
+                console.error("Gagal melakukan seed data:", err);
+            }
+        }
+
+        function updateCloudStatus(isConnected, text) {
+            if (isConnected) {
+                cloudStatus.innerHTML = `
+                    <i class="fa-solid fa-circle text-[7px] text-emerald-400"></i>
+                    <span>${text}</span>
+                `;
+            } else {
+                cloudStatus.innerHTML = `
+                    <i class="fa-solid fa-circle text-[7px] text-amber-400"></i>
+                    <span>${text}</span>
+                `;
+            }
+        }
+
+        // Event Listener Search
+        searchInput.addEventListener('input', updateDisplay);
+
+        btnClearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            btnClearSearch.classList.add('hidden');
+            updateDisplay();
+            searchInput.focus();
+        });
+
+        // Toggle Modal Tambah
+        btnOpenAddModal.addEventListener('click', () => {
+            addPtForm.reset();
+            addModal.classList.remove('hidden');
+            inputPtName.focus();
+        });
+
+        const closeAddModal = () => addModal.classList.add('hidden');
+        btnCloseAddModal.addEventListener('click', closeAddModal);
+        btnCancelAdd.addEventListener('click', closeAddModal);
+
+        // Submit Form Tambah PT
+        addPtForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = inputPtName.value.trim();
+            const number = inputPtNumber.value.trim();
+
+            if (name && number) {
+                const newId = Date.now().toString();
+                const newItem = { name, number, createdAt: Date.now() };
+
+                if (isCloudConnected && db && auth.currentUser) {
+                    // Simpan ke Firestore Database Cloud
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'pt_list', newId);
+                    await setDoc(docRef, newItem);
+                } else {
+                    // Fallback Lokal
+                    ptData.unshift({ id: newId, ...newItem });
+                    updateDisplay();
+                }
+
+                closeAddModal();
+            }
+        });
+
+        // Toggle Modal Hapus
+        window.prepareDelete = function(id) {
+            const target = ptData.find(item => item.id.toString() === id.toString());
+            if (target) {
+                deleteTargetId = id.toString();
+                deleteTargetText.textContent = `"${target.name}"`;
+                deleteModal.classList.remove('hidden');
+            }
+        };
+
+        const closeDeleteModal = () => {
+            deleteModal.classList.add('hidden');
+            deleteTargetId = null;
+        };
+
+        btnCancelDelete.addEventListener('click', closeDeleteModal);
+
+        btnConfirmDelete.addEventListener('click', async () => {
+            if (deleteTargetId !== null) {
+                if (isCloudConnected && db && auth.currentUser) {
+                    // Hapus dari Firestore Cloud
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'pt_list', deleteTargetId);
+                    await deleteDoc(docRef);
+                } else {
+                    // Fallback Lokal
+                    ptData = ptData.filter(item => item.id.toString() !== deleteTargetId);
+                    updateDisplay();
+                }
+                closeDeleteModal();
+            }
+        });
+
+        // Update Tampilan Utama
+        function updateDisplay() {
+            const query = searchInput.value.toLowerCase().trim();
+            
+            if (query.length > 0) {
+                btnClearSearch.classList.remove('hidden');
+            } else {
+                btnClearSearch.classList.add('hidden');
+            }
+
+            const filtered = ptData.filter(item => 
+                (item.name && item.name.toLowerCase().includes(query)) || 
+                (item.number && item.number.toLowerCase().includes(query))
+            );
+
+            renderTable(filtered, query);
+        }
+
+        // Render Tabel Data
+        function renderTable(data, query = '') {
+            tableBody.innerHTML = '';
+            badgeCount.textContent = `${data.length} PT Ditemukan`;
+
+            if (data.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white hover:bg-indigo-50/40 transition' : 'bg-slate-50/60 hover:bg-indigo-50/40 transition';
+
+                const highlightedName = query ? highlightMatch(item.name, query) : item.name;
+                const highlightedNumber = query ? highlightMatch(item.number, query) : item.number;
+
+                tr.innerHTML = `
+                    <td class="px-5 py-3.5 text-center text-slate-400 font-medium border-r border-slate-100">${index + 1}</td>
+                    <td class="px-5 py-3.5 font-semibold text-slate-800">${highlightedName}</td>
+                    <td class="px-5 py-3.5 text-center font-bold text-indigo-600 bg-indigo-50/30 rounded-lg">${highlightedNumber}</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <button onclick="prepareDelete('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition" title="Hapus Data">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </td>
+                `;
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Helper Highlight kata kunci
+        function highlightMatch(text, query) {
+            if (!text) return '';
+            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+            return text.replace(regex, `<mark class="bg-amber-300 text-slate-900 rounded px-1 py-0.5">$1</mark>`);
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Jalankan Inisialisasi Firebase Cloud Firestore
+        initFirebase();
+    </script>
+</body>
+</html>
