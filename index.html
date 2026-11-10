@@ -156,9 +156,24 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase bawaan lingkungan runtime
+        // =========================================================================
+        // 🔑 MASUKKAN KONFIGURASI FIREBASE ANDA DI SINI
+        // Ganti objek `myFirebaseConfig` di bawah dengan konfigurasi dari Firebase Console Anda:
+        // =========================================================================
+        const myFirebaseConfig = {
+            apiKey: "AKU_FIREBASE_API_KEY_ANDA",
+            authDomain: "PROJECT_ANDA.firebaseapp.com",
+            projectId: "PROJECT_ANDA",
+            storageBucket: "PROJECT_ANDA.firebasestorage.app",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+
+        // Identifikasi App ID & Config
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'nama-pt-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const firebaseConfig = (typeof myFirebaseConfig !== 'undefined' && myFirebaseConfig.apiKey !== "AKU_FIREBASE_API_KEY_ANDA") 
+            ? myFirebaseConfig 
+            : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null);
 
         // Data Asli Bawaan PDF
         const defaultPtData = [
